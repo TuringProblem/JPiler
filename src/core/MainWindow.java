@@ -61,8 +61,14 @@ public class MainWindow {
     // event listener for when the button is clicked
     bottomButton.addActionListener(e -> {
       // compileAndShowByteCode(inputText.getText());
+      try {
+        compileAndShowByteCode(inputText.getText());
 
-      System.out.println(inputText.getText());
+      } catch (IOException ex) {
+        System.out.println(ex.getMessage());
+      } catch (InterruptedException ex) {
+        System.out.println(ex.getMessage());
+      }
     });
 
   }
@@ -70,14 +76,17 @@ public class MainWindow {
   private void compileAndShowByteCode(String sourceCode) throws IOException, InterruptedException {
     String className = extractClassName(sourceCode);
     if (className == null) {
-      outputText.setText("Error: Class name not found");
+
+      // outputText.setText("Error: Class name not found");
+      outputText.setText(inputText.getText() + " This shit is whack son");
       return;
     }
     String fileName = className + ".java";
 
+    String command = "javac " + fileName;
     Files.writeString(Paths.get(fileName), sourceCode);
 
-    Process javacProcess = Runtime.getRuntime().exec("javac " + fileName);
+    Process javacProcess = Runtime.getRuntime().exec(command);
     javacProcess.waitFor();
 
     if (javacProcess.exitValue() != 0) {
@@ -94,8 +103,8 @@ public class MainWindow {
   private String extractClassName(String sourceCode) {
     for (String line : sourceCode.split("\\R")) {
       line = line.trim();
-      if (line.startsWith("public class") || line.startsWith("class")) {
-        String[] tokens = line.split("\\s+");
+      if (line.startsWith("public") || line.startsWith("class")) {
+        String[] tokens = line.split("^(public\\s+)?(class|interface|record)\\s+(\\w+)");
         // int idx = line.indexOf("class");
         if (tokens.length >= 3) {
           return tokens[2].split("\\{")[0].trim();
