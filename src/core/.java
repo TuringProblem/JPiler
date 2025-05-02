@@ -83,7 +83,6 @@ public class MainWindow {
       return;
     }
     String fileName = className + ".java";
-    System.out.println(fileName);
 
     String command = "javac " + fileName;
     Files.writeString(Paths.get(fileName), sourceCode);
